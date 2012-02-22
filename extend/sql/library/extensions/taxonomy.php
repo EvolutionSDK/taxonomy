@@ -10,25 +10,30 @@ class Taxonomy {
 
 	public function _buildTable($tableName) {
 		e::$sql->architect("\$tags $tableName", array(
-			"id" => '_suppress',
-			"created_timestamp" => '_suppress',
-			"updated_timestamp" => array(
-				'Type' => 'timestamp',
-				'Null' => 'YES',
-				'Key' => '',
-				'Default' => 'CURRENT_TIMESTAMP',
-				'Extra' => 'on update CURRENT_TIMESTAMP'
-			),
-			"model" => array(
-				'Type' => 'string',
-				'Key' => 'PRI'
-			),
-			"model-id" => array(
-				'Type' => 'string',
-				'Key' => 'PRI'
-			),
-			"flags" => 'number'
+			'fields' => array(
+				"id" => '_suppress',
+				"created_timestamp" => '_suppress',
+				"updated_timestamp" => array(
+					'Type' => 'timestamp',
+					'Null' => 'YES',
+					'Key' => '',
+					'Default' => 'CURRENT_TIMESTAMP',
+					'Extra' => 'on update CURRENT_TIMESTAMP'
+				),
+				"model" => array(
+					'Type' => 'string',
+					'Key' => 'PRI'
+				),
+				"model-id" => array(
+					'Type' => 'string',
+					'Key' => 'PRI'
+				)
+			)
 		));
+	}
+
+	public function _tableStructure($table, &$structure) {
+		$structure['fields']['$tag-count'] = 'number';
 	}
 
 	public function modelTags(Model $model) {
