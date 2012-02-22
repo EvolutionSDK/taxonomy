@@ -27,7 +27,8 @@ class Taxonomy {
 				"model-id" => array(
 					'Type' => 'string',
 					'Key' => 'PRI'
-				)
+				),
+				"flags" => 'number'
 			)
 		));
 	}
@@ -51,5 +52,3 @@ class Taxonomy {
 	}
 
 }
-
-$list->_->taxonomy->hasTag('members.member', 'momentum.project');
