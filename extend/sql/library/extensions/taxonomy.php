@@ -38,8 +38,52 @@ class Taxonomy {
 		$structure['fields']['$tag-count'] = 'number';
 	}
 
-	public function modelTags(Model $model) {
-		return e::taxonomy($model);
+	public function modelAddTag(Model $model) {
+		$args = func_get_args();
+		array_shift($args);
+
+		$tagTable = "\$tags ".$model->__getTable();
+
+		if(count($args) > 0) if(is_array($args[0])) $args = $args[0];
+
+		foreach($args as $map) {
+			if($map instanceof Model);
+			else $map = e::map($map);
+
+			$q = e::$sql->query("SELECT * FROM `$tagTable` WHERE `owner` = '$model->id' AND `model` = '".$map->__map('bundlename')."' AND `model-id` = '$map->id'")->row();
+
+			if(!$q) e::$sql->insert($tagTable, array(
+				'model' => $map->__map('bundlename'),
+				'model-id' => $map->id,
+				'owner' => $model->id
+			));
+
+			$run = true;
+		}
+
+		if(!isset($run)) throw new Exception("No model Maps were passed");
+		return true;
+	}
+
+	public function modelRmvTag(Model $model) {
+		$args = func_get_args();
+		array_shift($args);
+
+		$tagTable = "\$tags ".$model->__getTable();
+
+		if(count($args) > 0) if(is_array($args[0])) $args = $args[0];
+
+		foreach($args as $map) {
+			if($map instanceof Model);
+			else $map = e::map($map);
+
+			$q = e::$sql->query("DELETE FROM `$tagTable` WHERE `owner` = '$model->id' AND `model` = '".$map->__map('bundlename')."'' AND `model-id` = '$map->id'");
+
+			$run = true;
+		}
+
+		if(!isset($run)) throw new Exception("No model Maps were passed");
+		return true;
 	}
 
 	public function listHasTag(ListObj $list) {
