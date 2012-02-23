@@ -13,7 +13,7 @@ class Taxonomy {
 			'fields' => array(
 				"id" => '_suppress',
 				"created_timestamp" => '_suppress',
-				"owner" => 'number',false
+				"owner" => 'number',
 				"updated_timestamp" => array(
 					'Type' => 'timestamp',
 					'Null' => 'YES',
