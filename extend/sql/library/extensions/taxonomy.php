@@ -29,7 +29,7 @@ class Taxonomy {
 	}
 
 	public function _tableStructure($table, &$structure) {
-		$structure['fields']['$tag-count'] = 'number';
+		$structure['fields']['$tag_count'] = 'number';
 	}
 
 	public function modelAddTag(Model $model) {
