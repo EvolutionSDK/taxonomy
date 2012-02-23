@@ -1,0 +1,6 @@
+tag:
+	singular: tag
+	plural: tags
+	fields:
+		category: string
+		name: string
