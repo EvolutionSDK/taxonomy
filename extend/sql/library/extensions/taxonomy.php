@@ -13,6 +13,7 @@ class Taxonomy {
 			'fields' => array(
 				"id" => '_suppress',
 				"created_timestamp" => '_suppress',
+				"owner" => 'number',
 				"updated_timestamp" => array(
 					'Type' => 'timestamp',
 					'Null' => 'YES',
@@ -41,12 +42,21 @@ class Taxonomy {
 		return e::taxonomy($model);
 	}
 
-	public function listHasTag(ListObj $list, $model) {
+	public function listHasTag(ListObj $list) {
 		$args = func_get_args();
 		array_shift($args);
 
-		foreach($args as $arg)
-			$list->condition('model', $arg);
+		$list->join('LEFT', "\$tags $list->_table", "`$list->_table`.`id` = `\$tags $list->_table`.`owner`");
+
+		foreach($args as $arg) {
+
+			if(strpos($arg, ':') !== false) {
+				list($model, $id) = explode(':', $arg);
+				$list->condition("`\$tags $list->_table`.`model` =", $model);
+				$list->condition("`\$tags $list->_table`.`model-id` =", $id);
+			}
+			else $list->condition("`\$tags $list->_table`.`model` =", $arg);
+		}
 
 		return $list;
 	}
