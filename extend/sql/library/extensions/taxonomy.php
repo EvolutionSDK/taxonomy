@@ -21,14 +21,8 @@ class Taxonomy {
 					'Default' => 'CURRENT_TIMESTAMP',
 					'Extra' => 'on update CURRENT_TIMESTAMP'
 				),
-				"model" => array(
-					'Type' => 'string',
-					'Key' => 'PRI'
-				),
-				"model-id" => array(
-					'Type' => 'string',
-					'Key' => 'PRI'
-				),
+				"model" => 'string',
+				"model-id" => 'string',
 				"flags" => 'number'
 			)
 		));
