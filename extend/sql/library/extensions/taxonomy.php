@@ -87,6 +87,8 @@ class Taxonomy {
 		$list->join('LEFT', "\$tags $list->_table", "`$list->_table`.`id` = `\$tags $list->_table`.`owner`");
 
 		foreach($args as $arg) {
+			if($arg instanceof Model)
+				$arg = $arg->__map();
 
 			if(strpos($arg, ':') !== false) {
 				list($model, $id) = explode(':', $arg);
