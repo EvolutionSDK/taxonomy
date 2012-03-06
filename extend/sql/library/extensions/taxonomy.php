@@ -80,6 +80,19 @@ class Taxonomy {
 		return true;
 	}
 
+	public function modelHasTag(Model $model, $map = false) {
+		if(!$map) throw new Exception("No model Map was passed");
+		$tagTable = "\$tags ".$model->__getTable();
+
+		if($map instanceof Model);
+		else $map = e::map($map);
+
+		$q = e::$sql->query("SELECT * FROM `$tagTable` WHERE `owner` = '$model->id' AND `model` = '".$map->__map('bundlename')."' AND `model-id` = '$map->id'")->row();
+
+		if(!$q) return false;
+		else return true;
+	}
+
 	public function listHasTag(ListObj $list) {
 		$args = func_get_args();
 		array_shift($args);
