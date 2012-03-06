@@ -59,7 +59,7 @@ class Taxonomy {
 		return true;
 	}
 
-	public function modelRmvTag(Model $model) {
+	public function modelRemoveTag(Model $model) {
 		$args = func_get_args();
 		array_shift($args);
 
