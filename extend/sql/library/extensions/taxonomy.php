@@ -71,7 +71,7 @@ class Taxonomy {
 			if($map instanceof Model);
 			else $map = e::map($map);
 
-			$q = e::$sql->query("DELETE FROM `$tagTable` WHERE `owner` = '$model->id' AND `model` = '".$map->__map('bundlename')."'' AND `model-id` = '$map->id'");
+			$q = e::$sql->query("DELETE FROM `$tagTable` WHERE `owner` = '$model->id' AND `model` = '".$map->__map('bundlename')."' AND `model-id` = '$map->id'");
 
 			$run = true;
 		}
