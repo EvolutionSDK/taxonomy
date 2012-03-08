@@ -93,6 +93,12 @@ class Taxonomy {
 		else return true;
 	}
 
+	public function modelListTags(Model $model) {
+		$tagTable = "\$tags ".$model->__getTable();
+
+		return e::$sql->query("SELECT * FROM `$tagTable` WHERE `owner` = '$model->id' ORDER BY `updated_timestamp` DESC")->all();
+	}
+
 	public function listHasTag(ListObj $list) {
 		$args = func_get_args();
 		array_shift($args);
