@@ -14,6 +14,13 @@ class Bundle extends SQLBundle {
 			list($category, $name) = explode(':', $slug, 2);
 			$result = e::$sql->query("SELECT * FROM `taxonomy.tag` WHERE `name` = '$name' AND `category` = '$category'")->row();
 			$run = 1; if($result) return $this->getTag($result);
+			else {
+				$tag = $this->newTag();
+				$tag->category = $category;
+				$tag->name = $name;
+				$tag->save();
+				return $tag;
+			}
 		}
 		throw new e\AutoLoadException;
 	}
