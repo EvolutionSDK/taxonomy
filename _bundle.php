@@ -10,7 +10,10 @@ class Bundle extends SQLBundle {
 	public function __callExtend($func, $args) {
 		static $run = 0;
 		if(($func == 'getTag' && !is_numeric($slug = $args[0])) || $run == 1) {
-			if(strpos($slug, ':') === false) throw new Exception("No category was specified in `getTag`");
+			if(strpos($slug, ':') === false) {
+				$category = 'default';
+				$name = $slug;
+			}
 			list($category, $name) = explode(':', $slug, 2);
 			$result = e::$sql->query("SELECT * FROM `taxonomy.tag` WHERE `name` = '$name' AND `category` = '$category'")->row();
 			$run = 1; if($result) return $this->getTag($result);
