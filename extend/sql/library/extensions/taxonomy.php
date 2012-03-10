@@ -3,6 +3,7 @@
 namespace Bundles\SQL\Extensions;
 use Bundles\SQL\ListObj;
 use Bundles\SQL\Model;
+use MapException;
 use Exception;
 use e;
 
@@ -41,8 +42,15 @@ class Taxonomy {
 		if(count($args) > 0) if(is_array($args[0])) $args = $args[0];
 
 		foreach($args as $map) {
-			if($map instanceof Model);
-			else $map = e::map($map);
+
+			try {
+				if($map instanceof Model);
+				else $map = e::map($map);
+			}
+
+			catch(MapException $e) {
+				$map = e::$taxonomy->getTag($map);
+			}
 
 			$q = e::$sql->query("SELECT * FROM `$tagTable` WHERE `owner` = '$model->id' AND `model` = '".$map->__map('bundlename')."' AND `model-id` = '$map->id'")->row();
 
