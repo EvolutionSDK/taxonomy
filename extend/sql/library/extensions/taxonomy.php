@@ -126,8 +126,19 @@ class Taxonomy {
 		$list->join('LEFT', "\$tags $list->_table", "`$list->_table`.`id` = `\$tags $list->_table`.`owner`");
 
 		foreach($args as $arg) {
+
+			try {
+				if($arg instanceof Model);
+				else $arg = e::map($arg);
+			}
+
+			catch(MapException $e) {
+				$arg = e::$taxonomy->getTag($arg);
+			}
+
 			if($arg instanceof Model)
 				$arg = $arg->__map();
+			else throw new Exception("There was a unknown problem in List Has Tag", 500);
 
 			if(strpos($arg, ':') !== false) {
 				list($model, $id) = explode(':', $arg);
