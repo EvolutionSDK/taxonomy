@@ -9,14 +9,14 @@ class Bundle extends SQLBundle {
 
 	public function __callExtend($func, $args) {
 		static $run = 0;
-		if(($func == 'getTag' && !is_numeric($slug = $args[0])) || $run !== 1) {
+		if(($func == 'getTag' && !is_numeric($slug = $args[0])) && $run < 1) {
 			if(strpos($slug, ':') === false) {
 				$category = 'default';
 				$name = $slug;
 			}
 			else list($category, $name) = explode(':', $slug, 2);
 			$result = e::$sql->query("SELECT * FROM `taxonomy.tag` WHERE `name` = '$name' AND `category` = '$category'")->row();
-			$run = 1; 
+			$run++;
 
 			if($result) return $this->getTag($result);
 			else {
