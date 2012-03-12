@@ -98,8 +98,14 @@ class Taxonomy {
 		if(!$map) throw new Exception("No model Map was passed");
 		$tagTable = "\$tags ".$model->__getTable();
 
-		if($map instanceof Model);
-		else $map = e::map($map);
+		try {
+			if($map instanceof Model);
+			else $map = e::map($map);
+		}
+
+		catch(MapException $e) {
+			$map = e::$taxonomy->getTag($map);
+		}
 
 		$q = e::$sql->query("SELECT * FROM `$tagTable` WHERE `owner` = '$model->id' AND `model` = '".$map->__map('bundlename')."' AND `model-id` = '$map->id'")->row();
 
