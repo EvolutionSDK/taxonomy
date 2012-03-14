@@ -116,7 +116,7 @@ class Taxonomy {
 
 		if($up_down) {
 			$q = e::$sql->query("SELECT * FROM `$tagTable` WHERE `owner` = '$model->id' AND `model` = '".$map->__map('bundlename')."' AND `model-id` = '$map->id'")->row();
-			if($priority == 1) $priority = ((float) $q['priority']) + 1;
+			if($priority) $priority = ((float) $q['priority']) + 1;
 			else $priority = ((float) $q['priority']) - 1;
 		}
 
