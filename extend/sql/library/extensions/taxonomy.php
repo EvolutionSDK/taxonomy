@@ -139,9 +139,12 @@ class Taxonomy {
 			$map = e::$taxonomy->getTag($map);
 		}
 
-		if($map instanceof Model)
-			$map = $map->__map();
-		else throw new Exception("There was a unknown problem in List Has Tag", 500);
+		try {
+			if($map instanceof Model)
+				$map = $map->__map();
+			else throw new Exception("There was a unknown problem in List Has Tag", 500);
+		}
+		catch(Exception $e) {}
 
 		if(strpos($map, ':') !== false) {
 			list($model, $id) = explode(':', $map);
