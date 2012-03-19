@@ -9,6 +9,7 @@ class Bundle extends SQLBundle {
 
 	public function __callExtend($func, $args) {
 		static $run = 0;
+
 		if(($func == 'getTag' && !is_numeric($slug = $args[0])) && $run < 1) {
 			if(strpos($slug, ':') === false) {
 				$category = 'default';
@@ -27,6 +28,7 @@ class Bundle extends SQLBundle {
 				return $tag;
 			}
 		}
+		$run = 0;
 		throw new e\AutoLoadException;
 	}
 
