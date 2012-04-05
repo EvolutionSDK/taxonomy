@@ -2,6 +2,7 @@
 
 namespace Bundles\Taxonomy;
 use Bundles\SQL\SQLBundle;
+use Bundles\SQL\callException;
 use Exception;
 use e;
 
@@ -85,7 +86,7 @@ class Bundle extends SQLBundle {
 		 * Throw an exception telling the call method to run normally
 		 * @author Kelly Becker
 		 */
-		throw new e\AutoLoadException;
+		throw new callException;
 	}
 
 }
