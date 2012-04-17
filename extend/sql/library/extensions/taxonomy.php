@@ -31,8 +31,9 @@ class Taxonomy {
 					'Default' => 'CURRENT_TIMESTAMP',
 					'Extra' => 'on update CURRENT_TIMESTAMP'
 				),
-				"model" => 'string',
-				"model-id" => 'string',
+				"+model" => 'string',
+				"+model-id" => 'number',
+				"+string" => 'string',
 				"flags" => 'number',
 				"priority" => 'number'
 			)
@@ -266,13 +267,8 @@ class Taxonomy {
 	 * Filtering function for lists
 	 * @author Kelly Becker
 	 */
-	public function listHasTag(ListObj $list, $map = false) {
-
-		/**
-		 * Start by joining the tags table with the table of model
-		 * @author Kelly Becker
-		 */
-		$list->join('LEFT', "\$tags $list->_table", "`$list->_table`.`id` = `\$tags $list->_table`.`owner`");
+	public function listHasTag(ListObj $list, $map = false, $or = false) {
+		if(!isset($list->__taxonomy_cache)) $list->__taxonomy_cache = array();
 
 		/**
 		 * If a model instace was passed do nothing, if a map was passed convert it to a model
@@ -280,7 +276,7 @@ class Taxonomy {
 		 */
 		try {
 			if($map instanceof Model);
-			else $map = e::map($map);
+			else $map = e::map($map, true);
 		}
 
 		/**
@@ -288,47 +284,114 @@ class Taxonomy {
 		 * @author Kelly Becker
 		 */
 		catch(MapException $e) {
-			$map = e::$taxonomy->getTag($map);
+			/**
+			 * If we dont detect a category then use "default"
+			 * @author Kelly Becker
+			 */
+			if(strpos($map, ':') === false)
+				$map = 'default:'.$map;
+
+			$realtag = true;
 		}
 
 		/**
 		 * I know we just got ourselves a model from a map but lets get the map back
 		 * @author Kelly Becker
 		 */
-		try {
-			if($map instanceof Model)
-				$map = $map->__map();
-			else throw new Exception("There was a unknown problem in List Has Tag", 500);
+		if($map instanceof Model) $map = $map->__map();
+
+		/**
+		 * Start working with the list
+		 */
+		if(isset($realtag))
+			$list->__taxonomy_cache[($or ? 'O' : 'A').':taxonomy.tag'][] = $map;
+		else {
+			list($model, $id) = explode(':', $map, 2);
+			$list->__taxonomy_cache[($or ? 'O' : 'A').':'.$model][] = $id;
 		}
-		catch(Exception $e) {}
-
-		/**
-		 * If you are requesting an id with the map then break it up
-		 * @author Kelly Becker
-		 */
-		if(strpos($map, ':') !== false) {
-			list($model, $id) = explode(':', $map);
-			$list->condition("`\$tags $list->_table`.`model` =", $model);
-			$list->condition("`\$tags $list->_table`.`model-id` =", $id);
-		}
-
-		/**
-		 * Id no id is requested then just list off the ones with tags to the model type
-		 * @author Kelly Becker
-		 */
-		else $list->condition("`\$tags $list->_table`.`model` =", $arg);
-
-		/**
-		 * Set the order to be by tag priortiy
-		 * @author Kelly Becker
-		 */
-		$list->order("`\$tags $list->_table`.`priority`", ASC);
 
 		/**
 		 * Return the list object
 		 * @author Kelly Becker
 		 */
 		return $list;
+	}
+
+	/**
+	 * Run the tag filtration
+	 * @author Kelly Becker
+	 */
+	public function list_on_run_query(ListObj $list) {
+		if(empty($list->__taxonomy_cache)) return false;
+		
+		$tax_cache = $list->__taxonomy_cache;
+
+		foreach($tax_cache as $tag => $ids) {
+			$flag = substr($tag, 0, 1);
+			$tag = substr($tag, 2);
+
+			$query = "`model` = '$tag'";
+			if($tag !== 'taxonomy.tag' && $flag == 'O') {
+				foreach($ids as $id) {
+					if(!empty($query))
+						$query .= ' || ';
+
+					$query .= "`model-id` = '$id'";
+				}
+			}
+
+			else if($tag !== 'taxonomy.tag' && $flag == 'A') {
+				foreach($ids as $id) {
+					if(!empty($query))
+						$query .= ' && ';
+
+					$query .= "`model-id` = '$id'";
+				}
+			}
+
+			else if($tag === 'taxonomy.tag' && $flag == 'O') {
+				foreach($ids as $string) {
+					if(empty($string))
+						break;
+					if(!empty($query))
+						$query .= ' || ';
+
+					$query .= "`string` = '$string'";
+				}
+			}
+
+			else if($tag === 'taxonomy.tag' && $flag == 'A') {
+				foreach($ids as $string) {
+					if(empty($string))
+						break;
+					if(!empty($query))
+						$query .= ' && ';
+
+					$query .= "`string` = '$string'";
+				}
+			}
+
+			if(empty($query)) continue;
+
+			$query = "`id` IN (SELECT `owner` FROM `\$tags $list->_table` WHERE $query)";
+			$list->manual_condition($query);
+		}
+
+		/**
+		 * Destroy the cache
+		 */
+		$list->__taxonomy_cache = array();
+
+		/**
+		 * Left join the tags table
+		 */
+		$list->join('LEFT', "\$tags $list->_table", "`$list->_table`.`id` = `\$tags $list->_table`.`owner`");
+
+		/**
+		 * Set the order to be by tag priortiy
+		 * @author Kelly Becker
+		 */
+		$list->order("`\$tags $list->_table`.`priority`", 'ASC');
 	}
 
 }
