@@ -388,6 +388,11 @@ class Taxonomy {
 		$list->join('LEFT', "\$tags $list->_table", "`$list->_table`.`id` = `\$tags $list->_table`.`owner`");
 
 		/**
+		 * Group By ID
+		 */
+		$list->group_by("$list->_table`.`id");
+
+		/**
 		 * Set the order to be by tag priortiy
 		 * @author Kelly Becker
 		 */
