@@ -74,6 +74,7 @@ class Taxonomy {
 		 * @author Kelly Becker
 		 */
 		catch(MapException $e) {
+			$realtag = true;
 			$map = e::$taxonomy->getTag($map);
 		}
 
@@ -87,12 +88,17 @@ class Taxonomy {
 		 * If the tag does not exist yet create it on the table
 		 * @author Kelly Becker
 		 */
-		if(!$q) e::$sql->insert($tagTable, array(
+		$insert = array(
 			'model' => $map->__map('bundlename'),
 			'model-id' => $map->id,
 			'owner' => $model->id,
 			'priority' => $priority
-		));
+		);
+
+		if(isset($realtag))
+			$insert['string'] = $map->category.':'.$map->name;
+
+		if(!$q) e::$sql->insert($tagTable, );
 
 		return true;
 	}
@@ -295,7 +301,7 @@ class Taxonomy {
 		}
 
 		/**
-		 * I know we just got ourselves a model from a map but lets get the map back
+		 * If we have a model get the map
 		 * @author Kelly Becker
 		 */
 		if($map instanceof Model) $map = $map->__map();
