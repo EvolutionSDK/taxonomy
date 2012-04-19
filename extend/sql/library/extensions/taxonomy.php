@@ -98,7 +98,7 @@ class Taxonomy {
 		if(isset($realtag))
 			$insert['string'] = $map->category.':'.$map->name;
 
-		if(!$q) e::$sql->insert($tagTable, );
+		if(!$q) e::$sql->insert($tagTable, $insert);
 
 		return true;
 	}

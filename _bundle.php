@@ -89,4 +89,32 @@ class Bundle extends SQLBundle {
 		throw new callException;
 	}
 
+	public function route() {
+		$tables = e::$sql->query("SHOW TABLES LIKE '\$tags%'")->all();
+		foreach($tables as &$table)
+			$table = array_shift($table);
+
+		foreach($tables as $table) {
+			$tags = e::$sql->query("SELECT * FROM `$table`")->all();
+			foreach($tags as $tag) {
+				
+				if($tag['model'] !== 'taxonomy.tag')
+					continue;
+
+				$owner = $tag['owner'];
+				$id = $tag['model-id'];
+				$tag = $this->getTag($id);
+
+				e::$sql->update($table, array(
+					'string' => $tag->category.':'.$tag->name
+				), "WHERE `owner` = '$owner'");
+
+				$tag->__destruct();
+				unset($tag);
+			}
+		}
+		echo "Upgrade completed";
+		e\Complete();
+	}
+
 }
