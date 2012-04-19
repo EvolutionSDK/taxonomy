@@ -269,11 +269,15 @@ class Taxonomy {
 		else return true;
 	}
 
+	public function listExcludeTag(ListObj $list, $map, $or = false) {
+		return $this->listHasTag($list, $map, $or, true);
+	}
+
 	/**
 	 * Filtering function for lists
 	 * @author Kelly Becker
 	 */
-	public function listHasTag(ListObj $list, $map = false, $or = false) {
+	public function listHasTag(ListObj $list, $map = false, $or = false, $opposite = false) {
 		if(!isset($list->__taxonomy_cache)) $list->__taxonomy_cache = array();
 
 		/**
@@ -316,6 +320,9 @@ class Taxonomy {
 			$list->__taxonomy_cache[($or ? 'O' : 'A').':'.$model][] = $id;
 		}
 
+		if($opposite)
+			$list->__taxonomy_cache['opposite'] = true;
+
 		/**
 		 * Return the list object
 		 * @author Kelly Becker
@@ -331,6 +338,10 @@ class Taxonomy {
 		if(empty($list->__taxonomy_cache)) return false;
 		
 		$tax_cache = $list->__taxonomy_cache;
+
+		if(isset($tax_cache['opposite']))
+			$opposite = $tax_cache['opposite'];
+		unset($tax_cache['opposite']);
 
 		foreach($tax_cache as $tag => $ids) {
 			$flag = substr($tag, 0, 1);
@@ -379,7 +390,11 @@ class Taxonomy {
 
 			if(empty($query)) continue;
 
-			$query = "`id` IN (SELECT `owner` FROM `\$tags $list->_table` WHERE $query)";
+			if($opposite)
+				$opposite = "NOT ";
+			else $opposite = '';
+
+			$query = "`id` $opposite IN (SELECT `owner` FROM `\$tags $list->_table` WHERE $query)";
 			$list->manual_condition($query);
 		}
 
