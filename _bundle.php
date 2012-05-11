@@ -28,7 +28,7 @@ class Bundle extends SQLBundle {
 		 * If we are getting a tag, the argument passed is not numeric, and we havent been here before
 		 * @author Kelly Becker
 		 */
-		if(($func == 'getTag' && !is_numeric($slug = $args[0])) && $run < 1) {
+		if(($func == 'getTag' && is_string($slug = $args[0])) && $run < 1) {
 
 			/**
 			 * If we dont detect a category then use "default"
