@@ -142,6 +142,27 @@ class Taxonomy {
 	}
 
 	/**
+	 * Remove a tag by model or tag name
+	 * @author Kelly Becker
+	 */
+	public function modelRemoveAllTags(Model $model) {
+
+		/**
+		 * Generate the name of the table were gonna use
+		 * @author Kelly Becker
+		 */
+		$tagTable = "\$tags ".$model->__getTable();
+
+		/**
+		 * Delete the tags from the tag table
+		 * @author Kelly Becker
+		 */
+		$q = e::$sql->query("DELETE FROM `$tagTable` WHERE `owner` = '$model->id'")->row();
+
+		return true;
+	}
+
+	/**
 	 * Check if a tag exists on the model
 	 * @author Kelly Becker
 	 */
