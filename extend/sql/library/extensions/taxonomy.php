@@ -415,7 +415,7 @@ class Taxonomy {
 				$opposite = "NOT ";
 			else $opposite = '';
 
-			$query = "`id` $opposite IN (SELECT `owner` FROM `\$tags $list->_table` WHERE $query)";
+			$query = "(`\$tags $list->_table`.`model` ='$tag' && `id` $opposite IN (SELECT `owner` FROM `\$tags $list->_table` WHERE $query))";
 			$list->manual_condition($query);
 		}
 
