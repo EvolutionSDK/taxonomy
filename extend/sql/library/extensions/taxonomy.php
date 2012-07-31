@@ -364,6 +364,8 @@ class Taxonomy {
 			$opposite = $tax_cache['opposite'];
 		unset($tax_cache['opposite']);
 
+		$tag_on = array();
+		$tag_condition = array();
 		foreach($tax_cache as $tag => $ids) {
 			$flag = substr($tag, 0, 1);
 			$tag = substr($tag, 2);
@@ -415,9 +417,13 @@ class Taxonomy {
 				$opposite = "NOT ";
 			else $opposite = '';
 
-			$query = "(`\$tags $list->_table`.`model` ='$tag' && `id` $opposite IN (SELECT `owner` FROM `\$tags $list->_table` WHERE $query))";
-			$list->manual_condition($query);
+			$tag_on[] = "`\$tags $list->_table`.`model` ='$tag'";
+			$tag_condition[] = "`id` $opposite IN (SELECT `owner` FROM `\$tags $list->_table` WHERE $query)";
 		}
+
+
+		$query = "((".implode(' || ', $tag_on).") && (".implode(' && ', $tag_condition)."))";
+		$list->manual_condition($query);
 
 		/**
 		 * Destroy the cache
