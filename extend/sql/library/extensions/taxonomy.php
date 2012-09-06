@@ -422,29 +422,39 @@ class Taxonomy {
 		}
 
 
-		$query = "((".implode(' || ', $tag_on).") && (".implode(' && ', $tag_condition)."))";
-		$list->manual_condition($query);
+		/**
+		 * If we're querying multiple tags, there's no need to return any data for the tag like the permissions, etc.
+		 */
+		if(count($tag_on) > 1) {
+			$query = implode(' && ', $tag_condition);
+			$list->manual_condition($query);
+
+		} else {
+			$query = "((".implode(' || ', $tag_on).") && (".implode(' && ', $tag_condition)."))";
+			$list->manual_condition($query);
+
+			/**
+			 * Left join the tags table
+			 */
+			$list->join('LEFT', "\$tags $list->_table", "`$list->_table`.`id` = `\$tags $list->_table`.`owner`");
+
+
+			/**
+			 * Group By ID
+			 */
+			$list->group_by("$list->_table`.`id");
+
+			/**
+			 * Set the order to be by tag priortiy
+			 * @author Kelly Becker
+			 */
+			$list->order("`\$tags $list->_table`.`priority`", 'ASC');
+		}
 
 		/**
 		 * Destroy the cache
 		 */
 		$list->__taxonomy_cache = array();
-
-		/**
-		 * Left join the tags table
-		 */
-		$list->join('LEFT', "\$tags $list->_table", "`$list->_table`.`id` = `\$tags $list->_table`.`owner`");
-
-		/**
-		 * Group By ID
-		 */
-		$list->group_by("$list->_table`.`id");
-
-		/**
-		 * Set the order to be by tag priortiy
-		 * @author Kelly Becker
-		 */
-		$list->order("`\$tags $list->_table`.`priority`", 'ASC');
 	}
 
 }
